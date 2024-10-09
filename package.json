@@ -1,6 +1,7 @@
 {
   "name": "json-cat",
   "displayName": "JSON-Cat",
+  "publisher": "sumneko",
   "author": {
     "name": "sumneko"
   },
