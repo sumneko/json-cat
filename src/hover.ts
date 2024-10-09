@@ -9,7 +9,7 @@ function isValidIdentifier(value: string) {
 export class HoverProvider implements vscode.HoverProvider {
     constructor(private manager: Manager) {}
 
-    async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
+    async provideHover(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover | undefined> {
         let config = vscode.workspace.getConfiguration('json-cat.hover', document);
         if (!config.get<boolean>('enable')) {
             return undefined;

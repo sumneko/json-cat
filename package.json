@@ -22,6 +22,14 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "configurationDefaults": {
+      "[json]": {
+        "editor.inlayHints.enabled": "on"
+      },
+      "[jsonc]": {
+        "editor.inlayHints.enabled": "on"
+      }
+    },
     "configuration": {
       "properties": {
         "json-cat.hover.enable": {

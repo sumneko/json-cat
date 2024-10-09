@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { Manager } from './file';
 import { HoverProvider } from './hover';
+import { InlayHintsProvider } from './inlayHints';
 
 export function activate(context: vscode.ExtensionContext) {
     const manager = new Manager();
@@ -29,6 +30,8 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.languages.registerHoverProvider(['json', 'jsonc'], new HoverProvider(manager)));
+
+    context.subscriptions.push(vscode.languages.registerInlayHintsProvider(['json', 'jsonc'], new InlayHintsProvider(manager)));
 }
 
 export function deactivate() {}
