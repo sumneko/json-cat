@@ -10,7 +10,8 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onLanguage:json"
+    "onLanguage:json",
+    "onLanguage:jsonc"
   ],
   "main": "./dist/extension.js",
   "contributes": {

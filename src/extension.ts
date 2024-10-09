@@ -1,14 +1,28 @@
 import * as vscode from 'vscode';
+import { Manager } from './manager';
+import { HoverProvider } from './hover';
 
 export function activate(context: vscode.ExtensionContext) {
+    const manager = new Manager();
 
-    console.log('Congratulations, your extension "json-cat" is now active!');
+    context.subscriptions.push(vscode.workspace.onDidOpenTextDocument((e) => {
+        if (e.languageId === 'json' || e.languageId === 'jsonc') {
+            manager.open(e.uri, e.getText());
+        }
+    }));
 
-    const disposable = vscode.commands.registerCommand('json-cat.helloWorld', () => {
-        vscode.window.showInformationMessage('Hello World from json-cat!');
-    });
+    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument((e) => {
+        const file = manager.get(e.document.uri);
+        if (file) {
+            file.context = e.document.getText();
+        }
+    }));
 
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(vscode.workspace.onDidCloseTextDocument((e) => {
+        manager.close(e.uri);
+    }));
+
+    context.subscriptions.push(vscode.languages.registerHoverProvider(['json', 'jsonc'], new HoverProvider(manager)));
 }
 
 export function deactivate() {}
