@@ -1,7 +1,7 @@
 import * as jsonc from 'jsonc-parser';
 import * as vscode from 'vscode';
 
-class File {
+export class File {
     private _context: string;
     constructor(context: string) {
         this._context = context;

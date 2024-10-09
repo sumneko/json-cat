@@ -1,22 +1,13 @@
 import * as vscode from 'vscode';
-import { Manager } from './manager';
+import { Manager, File } from './file';
 import * as jsonc from 'jsonc-parser';
+
+function isValidIdentifier(value: string) {
+    return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value);
+}
 
 export class HoverProvider implements vscode.HoverProvider {
     constructor(private manager: Manager) {}
-
-    private viewString(value: any): vscode.Hover | undefined {
-        if (typeof value !== 'string') {
-            return undefined;
-        }
-        // 将 "\uXXXX" 转换为对应的字符
-        const content = value.replace(/\\u(\w{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-        if (content === value) {
-            return undefined;
-        }
-
-        return new vscode.Hover(content);
-    }
 
     async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
         const file = this.manager.get(document.uri);
@@ -30,8 +21,46 @@ export class HoverProvider implements vscode.HoverProvider {
             return undefined;
         }
 
+        let md = new vscode.MarkdownString();
+
         if (node.type === 'string') {
-            return this.viewString(node.value);
+            if (typeof node.value !== 'string') {
+                return undefined;
+            }
+
+            const rawLength = node.length - 2;
+
+            if (rawLength === node.value.length) {
+                md.appendMarkdown(`length \`${node.value.length}\``);
+                md.appendMarkdown('  \n');
+            } else {
+                md.appendText(node.value);
+                md.appendMarkdown('\n\n---\n\n');
+                md.appendMarkdown(`length \`${node.value.length}\``);
+                md.appendMarkdown('  \n');
+                md.appendMarkdown(`law length \`${node.length - 2}\``);
+                md.appendMarkdown('  \n');
+            }
         }
+
+        let path = jsonc.getNodePath(node);
+        md.appendMarkdown(`path \`${path.map((value, index) => {
+            if (typeof value === 'number') {
+                return `[${value}]`;
+            } else if (isValidIdentifier(value)){
+                if (index === 0) {
+                    return value;
+                } else {
+                    return `.${value}`;
+                }
+            } else {
+                return `[${JSON.stringify(value)}]`;
+            }
+        }).join('')}\``);
+
+        return new vscode.Hover(md, new vscode.Range(
+            document.positionAt(node.offset + 1),
+            document.positionAt(node.offset + node.length - 1),
+        ));
     }
 }
