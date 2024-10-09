@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Manager, File } from './file';
+import { Manager } from './file';
 import * as jsonc from 'jsonc-parser';
 
 function isValidIdentifier(value: string) {
@@ -10,6 +10,11 @@ export class HoverProvider implements vscode.HoverProvider {
     constructor(private manager: Manager) {}
 
     async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
+        let config = vscode.workspace.getConfiguration('json-cat.hover', document);
+        if (!config.get<boolean>('enable')) {
+            return undefined;
+        }
+
         const file = this.manager.get(document.uri);
         if (!file || !file.tree) {
             return undefined;
@@ -30,11 +35,15 @@ export class HoverProvider implements vscode.HoverProvider {
 
             const rawLength = node.length - 2;
 
-            if (rawLength === node.value.length) {
+            if (rawLength === node.value.length || !config.get<boolean>('showStringLength')) {
                 md.appendMarkdown(`length \`${node.value.length}\``);
                 md.appendMarkdown('  \n');
             } else {
-                md.appendText(node.value);
+                if (node.value.length > 1000) {
+                    md.appendText(node.value.slice(0, 997) + '...');
+                } else {
+                    md.appendText(node.value);
+                }
                 md.appendMarkdown('\n\n---\n\n');
                 md.appendMarkdown(`length \`${node.value.length}\``);
                 md.appendMarkdown('  \n');
@@ -44,9 +53,13 @@ export class HoverProvider implements vscode.HoverProvider {
         }
 
         let path = jsonc.getNodePath(node);
+        let indexBase = config.get<number>('arrayIndexBase');
+        if (typeof indexBase !== 'number') {
+            indexBase = 0;
+        }
         md.appendMarkdown(`path \`${path.map((value, index) => {
             if (typeof value === 'number') {
-                return `[${value}]`;
+                return `[${value + indexBase}]`;
             } else if (isValidIdentifier(value)){
                 if (index === 0) {
                     return value;

@@ -1,6 +1,6 @@
 {
   "name": "json-cat",
-  "displayName": "json-cat",
+  "displayName": "JSON-Cat",
   "author": {
     "name": "sumneko"
   },
@@ -22,6 +22,31 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "properties": {
+        "json-cat.hover.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable hover"
+        },
+        "json-cat.hover.showStringLength": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show length of string"
+        },
+        "json-cat.hover.arrayIndexBase": {
+          "type": "number",
+          "default": 0,
+          "enum": [0, 1, 0.5],
+          "description": "Base of array index",
+          "enumDescriptions": [
+            "Array indices represent offsets in memory, and the first item should be 0.",
+            "Array indices indicate the position of an element within the array, and starting from 1 would be more intuitive.",
+            "How about we compromise…"
+          ]
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
