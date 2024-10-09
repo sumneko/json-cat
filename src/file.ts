@@ -24,7 +24,7 @@ export class File {
 
     set context(value: string) {
         this._tree = undefined;
-        this.context = value;
+        this._context = value;
     }
 }
 

@@ -7,9 +7,20 @@ export class InlayHintsProvider implements vscode.InlayHintsProvider {
     constructor(private manager: Manager) {}
 
     async provideInlayHints(document: vscode.TextDocument, range: vscode.Range, token: vscode.CancellationToken): Promise<vscode.InlayHint[] | undefined> {
+        let inlayConfig = vscode.workspace.getConfiguration('json-cat.inlayHints', document);
+        let miscConfig = vscode.workspace.getConfiguration('json-cat.misc', document);
+        if (!inlayConfig.get<boolean>('enable')) {
+            return undefined;
+        }
+
         const file = this.manager.get(document.uri);
         if (!file || !file.tree) {
             return undefined;
+        }
+
+        let indexBase = miscConfig.get<number>('arrayIndexBase') as number;
+        if (typeof indexBase !== 'number') {
+            indexBase = 0;
         }
 
         let hints: vscode.InlayHint[] = [];
@@ -46,12 +57,12 @@ export class InlayHintsProvider implements vscode.InlayHintsProvider {
 
             for (let i = 0; i < node.children.length; i++) {
                 const child = node.children[i];
-                await lookInto(child, i, node.children.length);
+                await lookInto(child, i + indexBase, node.children.length - 1 + indexBase);
             }
         }
 
         try {
-            await lookInto(file.tree, 0, 0);
+            await lookInto(file.tree, indexBase, indexBase);
         } catch (error) {
             return undefined;
         }

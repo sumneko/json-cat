@@ -42,7 +42,12 @@
           "default": true,
           "description": "Show length of string"
         },
-        "json-cat.hover.arrayIndexBase": {
+        "json-cat.inlayHints.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable inlay hints"
+        },
+        "json-cat.misc.arrayIndexBase": {
           "type": "number",
           "default": 0,
           "enum": [0, 1, 0.5],

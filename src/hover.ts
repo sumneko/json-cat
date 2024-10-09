@@ -10,8 +10,9 @@ export class HoverProvider implements vscode.HoverProvider {
     constructor(private manager: Manager) {}
 
     async provideHover(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover | undefined> {
-        let config = vscode.workspace.getConfiguration('json-cat.hover', document);
-        if (!config.get<boolean>('enable')) {
+        let hoverConfig = vscode.workspace.getConfiguration('json-cat.hover', document);
+        let miscConfig = vscode.workspace.getConfiguration('json-cat.misc', document);
+        if (!hoverConfig.get<boolean>('enable')) {
             return undefined;
         }
 
@@ -35,7 +36,7 @@ export class HoverProvider implements vscode.HoverProvider {
 
             const rawLength = node.length - 2;
 
-            if (rawLength === node.value.length || !config.get<boolean>('showStringLength')) {
+            if (rawLength === node.value.length || !hoverConfig.get<boolean>('showStringLength')) {
                 md.appendMarkdown(`length \`${node.value.length}\``);
                 md.appendMarkdown('  \n');
             } else {
@@ -53,7 +54,7 @@ export class HoverProvider implements vscode.HoverProvider {
         }
 
         let path = jsonc.getNodePath(node);
-        let indexBase = config.get<number>('arrayIndexBase');
+        let indexBase = miscConfig.get<number>('arrayIndexBase');
         if (typeof indexBase !== 'number') {
             indexBase = 0;
         }
