@@ -47,6 +47,16 @@
           "default": true,
           "description": "Enable/disable inlay hints"
         },
+        "json-cat.inlayHints.showArrayIndex": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show array index"
+        },
+        "json-cat.inlayHints.showEscapedString": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show escaped string"
+        },
         "json-cat.misc.arrayIndexBase": {
           "type": "number",
           "default": 0,

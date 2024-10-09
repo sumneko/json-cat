@@ -42,12 +42,23 @@ export class InlayHintsProvider implements vscode.InlayHintsProvider {
                 return;
             }
             if (node.offset >= start && node.offset <= end) {
-                if (node.parent?.type === 'array') {
+                if (inlayConfig.get<boolean>('showArrayIndex')
+                && node.parent?.type === 'array') {
                     const paddedIndex = index.toString().padStart(max.toString().length, '0');
                     hints.push({
                         label: `[${paddedIndex}]`,
                         kind: vscode.InlayHintKind.Parameter,
                         position: document.positionAt(node.offset),
+                    });
+                }
+                if (inlayConfig.get<boolean>('showEscapedString')
+                && node.type === 'string'
+                && typeof node.value === 'string'
+                && node.value.length !== node.length - 2) {
+                    hints.push({
+                        label: `${node.value}`,
+                        kind: vscode.InlayHintKind.Parameter,
+                        position: document.positionAt(node.offset + 1),
                     });
                 }
             }
